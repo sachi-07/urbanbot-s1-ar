@@ -234,6 +234,20 @@
   var hint = document.getElementById('hint');
   var arButton = document.getElementById('arButton');
 
+  // 로봇은 길이 1m·폭 0.63m라, 세로로 긴 휴대폰 화면에서는 기본 자동 프레이밍이
+  // 옆으로 잘린다. 화면 비율에 따라 카메라 거리(자동 거리의 %)를 조정한다.
+  function frameModel() {
+    var ratio = window.innerWidth / window.innerHeight;
+    viewer.setAttribute('camera-orbit', ratio < 0.85
+      ? '24deg 72deg 182%'
+      : '24deg 76deg 118%');
+  }
+  frameModel();
+  window.addEventListener('orientationchange', frameModel);
+  window.addEventListener('resize', function () {
+    if (!viewer.modelIsVisible) { frameModel(); }
+  });
+
   var ua = navigator.userAgent || '';
   var isIOS = /iPad|iPhone|iPod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
   var isAndroid = /Android/.test(ua);
