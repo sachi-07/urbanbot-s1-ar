@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>debug</title>
+<style>body{margin:0;background:#111;color:#0f0;font:11px monospace}#log{position:fixed;left:0;top:0;z-index:9;white-space:pre;background:rgba(0,0,0,.72);padding:8px;max-height:100vh;overflow:auto}</style>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
+</head><body>
+<div id="log">loading…</div>
+<script type="module">
+import * as THREE from 'three';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+
+const log = (s) => { document.getElementById('log').textContent += '\n' + s; };
+const report = { errors: [] };
+window.addEventListener('error', e => report.errors.push(String(e.message)));
+window.addEventListener('unhandledrejection', e => report.errors.push(String(e.reason)));
+
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setSize(innerWidth, innerHeight);
+renderer.setPixelRatio(1);
+document.body.appendChild(renderer.domElement);
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x15181C);
+scene.add(new THREE.HemisphereLight(0xffffff, 0x222222, 2.0));
+const d = new THREE.DirectionalLight(0xffffff, 2.0); d.position.set(2, 4, 3); scene.add(d);
+
+const cam = new THREE.PerspectiveCamera(30, innerWidth / innerHeight, 0.01, 100);
+cam.position.set(1.6, 1.2, 2.4); cam.lookAt(0.1, 0.4, 0);
+
+new GLTFLoader().load('./urbanbot-s1.glb', (gltf) => {
+  const root = gltf.scene;
+  scene.add(root);
+  report.animations = gltf.animations.map(a => ({ name: a.name, duration: a.duration, tracks: a.tracks.length }));
+  report.rootChildren = root.children.map(c => c.name + ':' + c.type);
+  const flakes = [];
+  root.traverse(o => {
+    if (o.name && o.name.startsWith('SnowFlake')) {
+      const p = new THREE.Vector3(); o.getWorldPosition(p);
+      flakes.push(o.name + ' vis=' + o.visible + ' scale=' + o.scale.x.toFixed(4) +
+        ' p=' + p.x.toFixed(2) + ',' + p.y.toFixed(2) + ',' + p.z.toFixed(2) +
+        ' mat=' + (o.material ? o.material.name + '/' + o.material.type + '/col=' + (o.material.color ? o.material.color.getHexString() : '-') : 'none') +
+        ' verts=' + (o.geometry ? o.geometry.attributes.position.count : -1) +
+        ' bs=' + (o.geometry && o.geometry.boundingSphere ? o.geometry.boundingSphere.radius.toFixed(2) : 'none'));
+    }
+  });
+  report.flakeCount = flakes.length;
+  report.flakes = flakes.slice(0, 4);
+  const mixer = new THREE.AnimationMixer(root);
+  const action = mixer.clipAction(gltf.animations[0]);
+  action.setLoop(THREE.LoopRepeat); action.play();
+  report.clipTracks = gltf.animations[0].tracks.slice(0, 3).map(t => t.name + ' n=' + t.times.length + ' t0=' + t.times[0] + ' tN=' + t.times[t.times.length-1].toFixed(2));
+  report.flakeTracks = gltf.animations[0].tracks.filter(t => t.name.includes('SnowFlake')).slice(0, 4).map(t => t.name + ' n=' + t.times.length + ' v0=' + t.values.slice(0, 3).map(v => v.toFixed(4)).join(','));
+  // seek to a driving moment
+  mixer.setTime(5.30);
+  const fl2 = [];
+  root.traverse(o => {
+    if (o.name && o.name.startsWith('SnowFlake')) {
+      const p = new THREE.Vector3(); o.getWorldPosition(p);
+      fl2.push(o.name + ' s=' + o.scale.x.toFixed(4) + ' p=' + p.x.toFixed(2) + ',' + p.y.toFixed(2) + ',' + p.z.toFixed(2));
+    }
+  });
+  report.flakesAt530 = fl2;
+  renderer.render(scene, cam);
+  document.getElementById('log').textContent = 'REPORT\n' + JSON.stringify(report, null, 1);
+  window.__report = report;
+  window.__seek = (t) => { mixer.setTime(t); renderer.render(scene, cam); return 'ok'; };
+}, (p) => {}, (e) => { report.errors.push('load: ' + e); document.getElementById('log').textContent = JSON.stringify(report); });
+</script>
+</body></html>
