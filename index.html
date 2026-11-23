@@ -130,12 +130,10 @@
     box-shadow:0 10px 30px rgba(0,0,0,.45), 0 0 0 1px rgba(255,255,255,.5) inset;
     cursor:pointer;
     transition:transform .18s ease, box-shadow .18s ease;
-    animation:lift .5s ease both;
   }
   .ar-btn:active{transform:translateX(-50%) scale(.965);}
   .ar-btn svg{width:20px; height:20px; flex:none;}
   .ar-btn[hidden]{display:none;}
-  @keyframes lift{from{opacity:0; transform:translateX(-50%) translateY(10px);} to{opacity:1; transform:translateX(-50%) translateY(0);}}
   .ar-btn::after{
     content:""; position:absolute; inset:-6px; border-radius:999px;
     border:1px solid rgba(255,255,255,.22);
@@ -168,7 +166,7 @@
     .hint{min-height:0;}
   }
   @media (prefers-reduced-motion:reduce){
-    .ar-btn, .ar-btn::after, .dot{animation:none;}
+    .ar-btn::after, .dot{animation:none;}
   }
   noscript p{position:absolute; inset:auto 0 40% 0; text-align:center; padding:0 24px; font-size:13px; color:rgba(255,255,255,.7);}
 </style>
