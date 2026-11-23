@@ -189,9 +189,9 @@
       exposure="1.05"
       environment-image="neutral"
       interaction-prompt="none"
-      camera-orbit="24deg 74deg 118%"
-      min-camera-orbit="auto 45deg 70%"
-      max-camera-orbit="auto 92deg 220%"
+      camera-orbit="24deg 74deg auto"
+      min-camera-orbit="auto 45deg auto"
+      max-camera-orbit="auto 92deg auto"
       loading="eager"
       reveal="auto">
     <button id="arButton" slot="ar-button" class="ar-btn" type="button">
@@ -234,15 +234,27 @@
   var hint = document.getElementById('hint');
   var arButton = document.getElementById('arButton');
 
-  // 로봇은 길이 1m·폭 0.63m라, 세로로 긴 휴대폰 화면에서는 기본 자동 프레이밍이
-  // 옆으로 잘린다. 화면 비율에 따라 카메라 거리(자동 거리의 %)를 조정한다.
+  // 로봇은 길이 약 1m·폭 0.63m·높이 0.8m라, 세로로 긴 휴대폰 화면에서는 기본
+  // 자동 프레이밍(높이 기준)으로는 옆이 잘린다. 화면 비율과 모델 크기로 거리를 직접 계산한다.
+  var THETA = 24, PHI = 74, FOV = 30 * Math.PI / 180;
   function frameModel() {
-    var ratio = window.innerWidth / window.innerHeight;
-    viewer.setAttribute('camera-orbit', ratio < 0.85
-      ? '24deg 72deg 182%'
-      : '24deg 76deg 118%');
+    var d = viewer.getDimensions ? viewer.getDimensions() : null;
+    var W = (d && d.x) || 1.0;      // 길이(정면 방향)
+    var Hh = (d && d.y) || 0.8;     // 높이
+    var D = (d && d.z) || 0.63;     // 폭
+    var th = THETA * Math.PI / 180;
+    var projW = W * Math.sin(th) + D * Math.cos(th);   // 이 각도에서 보이는 가로 폭
+    var aspect = window.innerWidth / Math.max(window.innerHeight, 1);
+    var fovH = 2 * Math.atan(Math.tan(FOV / 2) * aspect);
+    var dv = (Hh * 0.5) / Math.tan(FOV / 2);
+    var dh = (projW * 0.5) / Math.tan(fovH / 2);
+    var dist = Math.max(dv, dh) * 1.12 + 0.6;          // +0.6: 주행해 앞으로 나오는 거리
+    viewer.setAttribute('camera-orbit', THETA + 'deg ' + PHI + 'deg ' + dist.toFixed(2) + 'm');
+    viewer.setAttribute('min-camera-orbit', 'auto 45deg ' + (dv * 0.95).toFixed(2) + 'm');
+    viewer.setAttribute('max-camera-orbit', 'auto 92deg ' + (dist * 2.2).toFixed(2) + 'm');
   }
   frameModel();
+  viewer.addEventListener('load', frameModel, { once: true });
   window.addEventListener('orientationchange', frameModel);
   window.addEventListener('resize', function () {
     if (!viewer.modelIsVisible) { frameModel(); }
