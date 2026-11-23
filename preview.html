@@ -9,6 +9,7 @@ figure{margin:0}figcaption{padding:2px 0}iframe{border:0;background:#111;display
   const w = q.get('w') || 390, h = q.get('h') || 844;
   const f = document.getElementById('f');
   f.width = w; f.height = h;
+  f.src = './index.html?cb=' + Date.now();
   document.getElementById('cap').textContent = w + ' x ' + h + ' (/?w=' + w + '&h=' + h + ')';
 </script>
 </body></html>
