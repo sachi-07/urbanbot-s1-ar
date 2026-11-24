@@ -275,10 +275,12 @@
   var chips = document.getElementById('chips');
   var modeButtons = Array.prototype.slice.call(document.querySelectorAll('.modes button'));
 
+  var V = '?v=20261124';   // 모델 캐시 갱신용 버전
+
   var MODES = {
     winter: {
-      glb: './urbanbot-s1.glb',
-      usdz: './urbanbot-s1.usdz',
+      glb: './urbanbot-s1.glb' + V,
+      usdz: './urbanbot-s1.usdz' + V,
       label: '제설',
       sub: '사계절 자율주행 도시관리 · 제설 로봇',
       alt: '어반봇 S1 제설 모듈 3D 모델',
@@ -287,8 +289,8 @@
       hint: '눈을 밀어내는 V-블레이드와 눈 날림이 12초 주행에 맞춰 재생됩니다.'
     },
     brush: {
-      glb: './urbanbot-s1-brush.glb',
-      usdz: './urbanbot-s1-brush.usdz',
+      glb: './urbanbot-s1-brush.glb' + V,
+      usdz: './urbanbot-s1-brush.usdz' + V,
       label: '브러셔',
       sub: '장마철 배수구 브러셔 · 낙엽·오염원 세척',
       alt: '어반봇 S1 배수구 브러셔 모듈 3D 모델',
@@ -297,8 +299,8 @@
       hint: '회전 브러셔가 배수구 주변 낙엽을 쓸어내고 물방울이 튑니다.'
     },
     spray: {
-      glb: './urbanbot-s1-spray.glb',
-      usdz: './urbanbot-s1-spray.usdz',
+      glb: './urbanbot-s1-spray.glb' + V,
+      usdz: './urbanbot-s1-spray.usdz' + V,
       label: '살수',
       sub: '여름 저상 살수 · 미세먼지 억제',
       alt: '어반봇 S1 저상 살수 모듈 3D 모델',
