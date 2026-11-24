@@ -175,6 +175,7 @@
 <main class="stage">
   <model-viewer id="viewer"
       src="./urbanbot-s1.glb"
+      ios-src="./urbanbot-s1.usdz"
       alt="어반봇 S1 3D 모델"
       ar
       ar-modes="webxr scene-viewer quick-look"
@@ -239,7 +240,7 @@
   var isIOS = /iPad|iPhone|iPod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
   var isAndroid = /Android/.test(ua);
 
-  var hintIOS = '<b>AR 버튼</b>을 누르면 카메라가 열립니다. 바닥을 비추고 화면을 탭하면 로봇이 그 자리에 섭니다.';
+  var hintIOS = '<b>AR 버튼</b>을 누르면 카메라가 열립니다. 바닥을 비추고 화면을 탭하면 로봇이 그 자리에 서고, 제설 주행과 눈 날림이 그대로 재생됩니다.';
   var hintAndroid = '<b>AR 버튼</b>을 누르면 카메라가 열립니다. 바닥을 비추며 기기를 움직여 위치를 잡고 화면을 눌러 놓으세요.';
   var hintDesktop = '휴대폰으로 이 페이지를 열면 로봇을 <b>바닥에 띄워</b> 볼 수 있습니다. 지금은 손가락(마우스)으로 돌려보세요.';
 
